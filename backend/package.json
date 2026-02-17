@@ -4,18 +4,25 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon ./src/server.js"
+    "dev": "nodemon ./src/server.js",
+    "migrate": "dotenvx run -- node-pg-migrate up -m migrations --migrations-table pgmigrations",
+    "migrate:down": "dotenvx run -- node-pg-migrate down -m migrations --migrations-table pgmigrations"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@dotenvx/dotenvx": "^1.52.0",
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
     "pg": "^8.18.0"
   },
   "devDependencies": {
+    "node-pg-migrate": "^8.0.4",
     "nodemon": "^3.1.11"
   }
 }

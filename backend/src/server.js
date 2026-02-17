@@ -1,22 +1,20 @@
-const express = require("express");
+require('dotenv').config();
 
-const app = express();
-const PORT = 3000;
+const app = require("./app");
+const pool = require('./config/db');
 
-// Middleware (for JSON parsing)
-app.use(express.json());
-
-// Test Route
-app.get("/", (req, res) => {
-    res.send("🚀 Express server is running!");
+// Test database connection
+app.get('/api/test-db', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT NOW()');
+        res.json({ success: true, time: result.rows[0] });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 });
 
-// Example API Route
-app.get("/api/test", (req, res) => {
-    res.json({ message: "API is working!" });
-});
 
-// Start Server
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
