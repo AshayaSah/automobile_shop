@@ -10,6 +10,16 @@ const register = async (req, res) => {
     }
 };
 
+const getUserByEmail = async (req, res) => {
+    try {
+        const { email } = req.body;
+        const user = await userService.listUserByEmail(email);
+        res.status(201).json(user);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+};
+
 const getUsers = async (req, res) => {
     const users = await userService.listUsers();
     res.json(users);
@@ -17,5 +27,6 @@ const getUsers = async (req, res) => {
 
 module.exports = {
     register,
+    getUserByEmail,
     getUsers,
 };
