@@ -12,11 +12,16 @@ const registerUser = async (name, email, password) => {
     return userModel.createUser(name, email, hashedPassword);
 };
 
+const listUserByEmail = async (email) => {
+    return userModel.findUserByEmail(email);
+};
+
 const listUsers = async () => {
     return userModel.getAllUsers();
 };
 
 module.exports = {
     registerUser,
+    listUserByEmail,
     listUsers,
 };
