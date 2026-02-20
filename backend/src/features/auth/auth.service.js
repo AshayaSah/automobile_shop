@@ -18,4 +18,10 @@ const loginUser = async (email, password) => {
     return token;
 };
 
-module.exports = { loginUser };
+const getMe = async (id) => {
+    const user = await userModel.findUserById(id);
+    if (!user) throw new Error("User not found");
+    return user;
+};
+
+module.exports = { loginUser, getMe };

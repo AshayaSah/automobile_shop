@@ -16,6 +16,14 @@ const findUserByEmail = async (email) => {
     return result.rows[0];
 };
 
+const findUserById = async (id) => {
+    const result = await pool.query(
+        "SELECT id, name, email FROM users WHERE id=$1", // never return password
+        [id]
+    );
+    return result.rows[0];
+};
+
 const getAllUsers = async () => {
     const result = await pool.query("SELECT id, name, email FROM users");
     return result.rows;
@@ -24,5 +32,6 @@ const getAllUsers = async () => {
 module.exports = {
     createUser,
     findUserByEmail,
+    findUserById,
     getAllUsers,
 };
