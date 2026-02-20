@@ -20,6 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { ModeToggle } from "./mode-toggle";
 
 const navLinks = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -53,6 +54,7 @@ export default function Navbar() {
 
   return (
     <nav className="w-full bg-background border-b border-border px-6 h-16 flex items-center justify-between sticky top-0 z-50">
+      
       {/* ── Brand ─────────────────────────────────── */}
       <Link to="/" className="shrink-0">
         <span className="text-xl font-extrabold tracking-tight text-foreground">
@@ -96,6 +98,8 @@ export default function Navbar() {
               <Plus size={13} />
               Add Vehicle
             </Link>
+
+            <ModeToggle></ModeToggle>
 
             {/* Messages */}
             <button

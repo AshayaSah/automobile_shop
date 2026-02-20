@@ -1,65 +1,122 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import { Badge } from "@/components/ui/badge";
 import type { Vehicle } from "@/types/vehicle.types";
 
-const conditionStyles = {
-  new: "bg-emerald-100 text-emerald-700",
-  used: "bg-amber-100 text-amber-700",
-};
-
-const typeIcons: Record<string, string> = {
-  car: "🚗",
-  motorcycle: "🏍️",
-  scooter: "🛵",
-};
-
 const VehicleCard = ({ vehicle }: { vehicle: Vehicle }) => {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const images = vehicle.images ?? [];
+  const hasMultiple = images.length > 1;
+
+  const prev = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setActiveIndex((i) => (i === 0 ? images.length - 1 : i - 1));
+  };
+
+  const next = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setActiveIndex((i) => (i === images.length - 1 ? 0 : i + 1));
+  };
+
   return (
     <Link to={`/vehicles/${vehicle.id}`} className="block group">
-      <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300">
-        {/* Image / Placeholder */}
-        <div className="relative h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-          {vehicle.images && vehicle.images.length > 0 ? (
+      <div className="bg-card border border-border rounded-2xl overflow-hidden hover:shadow-md hover:border-primary/30 transition-all duration-300">
+        {/* Image */}
+        <div className="relative h-44 bg-muted overflow-hidden">
+          {images.length > 0 ? (
             <img
-              src={vehicle.images[0]}
+              src={images[activeIndex]}
               alt={vehicle.model}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
           ) : (
-            <span className="text-6xl opacity-40">
-              {typeIcons[vehicle.type]}
-            </span>
+            <div className="w-full h-full flex items-center justify-center">
+              <p className="text-xs text-muted-foreground">No image</p>
+            </div>
           )}
 
-          {/* Condition Badge */}
-          <span
-            className={`absolute top-3 right-3 text-xs font-semibold px-2 py-1 rounded-full capitalize ${conditionStyles[vehicle.condition]}`}
-          >
-            {vehicle.condition}
-          </span>
+          {/* Prev / Next arrows — show on hover only if multiple images */}
+          {hasMultiple && (
+            <>
+              <button
+                onClick={prev}
+                className="absolute left-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-background/80 backdrop-blur-sm border border-border/50 text-foreground text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-background"
+              >
+                ‹
+              </button>
+              <button
+                onClick={next}
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-background/80 backdrop-blur-sm border border-border/50 text-foreground text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-background"
+              >
+                ›
+              </button>
+            </>
+          )}
+
+          {/* Dot indicators */}
+          {hasMultiple && (
+            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-1">
+              {images.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setActiveIndex(i);
+                  }}
+                  className={`w-1.5 h-1.5 rounded-full transition-all ${
+                    i === activeIndex ? "bg-white w-3" : "bg-white/50"
+                  }`}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Condition badge */}
+          <div className="absolute top-3 right-3">
+            <Badge
+              variant={vehicle.condition === "new" ? "default" : "secondary"}
+              className="capitalize text-[11px]"
+            >
+              {vehicle.condition}
+            </Badge>
+          </div>
+
+          {/* Type pill */}
+          <div className="absolute bottom-3 left-3">
+            <span className="bg-background/80 backdrop-blur-sm text-foreground text-[11px] font-medium px-2.5 py-1 rounded-full capitalize border border-border/50">
+              {vehicle.type}
+            </span>
+          </div>
+
+          {/* Image count badge top-left */}
+          {hasMultiple && (
+            <div className="absolute top-3 left-3">
+              <span className="bg-background/80 backdrop-blur-sm text-foreground text-[10px] font-medium px-2 py-0.5 rounded-full border border-border/50">
+                {activeIndex + 1}/{images.length}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Info */}
         <div className="p-4">
-          <div className="flex items-start justify-between gap-2 mb-1">
-            <h3 className="text-base font-bold text-gray-900 leading-tight group-hover:text-blue-600 transition-colors">
-              {vehicle.model}
-            </h3>
-            <span className="text-xs text-gray-400 capitalize shrink-0 mt-0.5">
-              {typeIcons[vehicle.type]} {vehicle.type}
-            </span>
-          </div>
+          <h3 className="text-sm font-bold text-foreground leading-tight group-hover:text-primary transition-colors truncate mb-1">
+            {vehicle.model}
+          </h3>
 
           {vehicle.description && (
-            <p className="text-sm text-gray-500 line-clamp-2 mb-3">
+            <p className="text-xs text-muted-foreground line-clamp-2 mb-3 leading-relaxed">
               {vehicle.description}
             </p>
           )}
 
-          <div className="flex items-center justify-between mt-2">
-            <span className="text-lg font-extrabold text-blue-600">
+          <div className="flex items-center justify-between mt-auto pt-3 border-t border-border">
+            <span className="text-base font-extrabold text-primary">
               Rs. {Number(vehicle.price).toLocaleString()}
             </span>
-            <span className="text-xs text-gray-400">{vehicle.contact}</span>
+            <span className="text-xs text-muted-foreground truncate max-w-[100px]">
+              {vehicle.contact}
+            </span>
           </div>
         </div>
       </div>

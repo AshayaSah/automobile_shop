@@ -1,6 +1,14 @@
 import { useEffect, useState } from "react";
 import api from "@/api/axios";
 import VehicleCard from "@/components/VehicleCard";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import type {
   Vehicle,
   VehicleType,
@@ -29,11 +37,9 @@ const Home = () => {
         setIsLoading(false);
       }
     };
-
     fetchVehicles();
   }, []);
 
-  // ── Derived filtered + sorted list ──────────────────────
   const filtered = vehicles
     .filter((v) => {
       const matchSearch =
@@ -52,99 +58,168 @@ const Home = () => {
     });
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">
-          Available Vehicles
-        </h1>
+    <div className="min-h-screen bg-background">
+      {/* ── Hero Banner ───────────────────────────────── */}
+      <div className="relative bg-card border-b border-border overflow-hidden">
+        {/* Decorative background blobs */}
+        <div className="absolute -top-16 -right-16 w-72 h-72 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-10 left-1/3 w-56 h-56 bg-primary/5 rounded-full blur-2xl pointer-events-none" />
 
-        {/* Search + Filters */}
-        <div className="flex flex-wrap gap-3">
-          <input
-            type="text"
-            placeholder="Search by model or description..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 min-w-[200px] px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+        <div className="relative max-w-6xl mx-auto px-6 py-10">
+          {/* Heading */}
+          <div className="mb-7">
+            <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-2">
+              VehicleMart
+            </p>
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-foreground tracking-tight leading-tight">
+              Find Your Next Ride
+            </h1>
+            <p className="text-muted-foreground text-sm mt-2">
+              Browse{" "}
+              {vehicles.length > 0 ? `${vehicles.length} listed` : "listed"}{" "}
+              vehicles from sellers near you
+            </p>
+          </div>
 
-          <select
-            value={typeFilter}
-            onChange={(e) =>
-              setTypeFilter(e.target.value as VehicleType | "all")
-            }
-            className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="all">All Types</option>
-            <option value="car">🚗 Car</option>
-            <option value="motorcycle">🏍️ Motorcycle</option>
-            <option value="scooter">🛵 Scooter</option>
-          </select>
+          {/* Search Bar */}
+          <div className="relative max-w-xl">
+            <Input
+              type="text"
+              placeholder="Search by model or description..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-4 pr-4 h-11 rounded-xl bg-background border-border text-sm"
+            />
+          </div>
 
-          <select
-            value={condFilter}
-            onChange={(e) =>
-              setCondFilter(e.target.value as VehicleCondition | "all")
-            }
-            className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="all">All Conditions</option>
-            <option value="new">New</option>
-            <option value="used">Used</option>
-          </select>
+          {/* Filters Row */}
+          <div className="flex flex-wrap gap-3 mt-4">
+            <Select
+              value={typeFilter}
+              onValueChange={(v) => setTypeFilter(v as VehicleType | "all")}
+            >
+              <SelectTrigger className="w-36 h-9 rounded-lg text-sm bg-background">
+                <SelectValue placeholder="All Types" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="car">Car</SelectItem>
+                <SelectItem value="motorcycle">Motorcycle</SelectItem>
+                <SelectItem value="scooter">Scooter</SelectItem>
+              </SelectContent>
+            </Select>
 
-          <select
-            value={sort}
-            onChange={(e) => setSort(e.target.value as SortOption)}
-            className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="newest">Newest First</option>
-            <option value="price_asc">Price: Low to High</option>
-            <option value="price_desc">Price: High to Low</option>
-          </select>
+            <Select
+              value={condFilter}
+              onValueChange={(v) =>
+                setCondFilter(v as VehicleCondition | "all")
+              }
+            >
+              <SelectTrigger className="w-36 h-9 rounded-lg text-sm bg-background">
+                <SelectValue placeholder="All Conditions" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Conditions</SelectItem>
+                <SelectItem value="new">New</SelectItem>
+                <SelectItem value="used">Used</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select
+              value={sort}
+              onValueChange={(v) => setSort(v as SortOption)}
+            >
+              <SelectTrigger className="w-44 h-9 rounded-lg text-sm bg-background">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="newest">Newest First</SelectItem>
+                <SelectItem value="price_asc">Price: Low to High</SelectItem>
+                <SelectItem value="price_desc">Price: High to Low</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Active filter pills */}
+            {(typeFilter !== "all" || condFilter !== "all" || search) && (
+              <button
+                onClick={() => {
+                  setSearch("");
+                  setTypeFilter("all");
+                  setCondFilter("all");
+                  setSort("newest");
+                }}
+                className="h-9 px-3 rounded-lg text-xs font-medium text-destructive border border-destructive/30 hover:bg-destructive/10 transition-colors"
+              >
+                Clear filters
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="px-6 py-6">
+      {/* ── Listings ──────────────────────────────────── */}
+      <div className="max-w-6xl mx-auto px-6 py-8">
+        {/* Loading Skeleton */}
         {isLoading && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {Array.from({ length: 8 }).map((_, i) => (
               <div
                 key={i}
-                className="bg-white rounded-2xl overflow-hidden shadow-sm animate-pulse"
+                className="bg-card rounded-2xl overflow-hidden border border-border animate-pulse"
               >
-                <div className="h-48 bg-gray-200" />
+                <div className="h-44 bg-muted" />
                 <div className="p-4 space-y-3">
-                  <div className="h-4 bg-gray-200 rounded w-3/4" />
-                  <div className="h-3 bg-gray-200 rounded w-full" />
-                  <div className="h-3 bg-gray-200 rounded w-1/2" />
+                  <div className="h-4 bg-muted rounded w-3/4" />
+                  <div className="h-3 bg-muted rounded w-full" />
+                  <div className="h-3 bg-muted rounded w-1/2" />
                 </div>
               </div>
             ))}
           </div>
         )}
 
+        {/* Error */}
         {error && (
-          <div className="text-center py-20">
-            <p className="text-red-500 text-sm">{error}</p>
+          <div className="flex flex-col items-center justify-center py-24 gap-3">
+            <p className="text-muted-foreground text-sm">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="text-primary text-sm hover:underline"
+            >
+              Try again
+            </button>
           </div>
         )}
 
+        {/* Empty State */}
         {!isLoading && !error && filtered.length === 0 && (
-          <div className="text-center py-20 text-gray-400">
-            <p className="text-4xl mb-3">🔍</p>
-            <p className="text-sm">No vehicles match your search.</p>
+          <div className="flex flex-col items-center justify-center py-24 gap-3 text-center">
+            <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center mb-1">
+              <span className="text-2xl">🔍</span>
+            </div>
+            <p className="text-foreground font-semibold text-sm">
+              No vehicles found
+            </p>
+            <p className="text-muted-foreground text-xs max-w-xs">
+              Try adjusting your search or filters to find what you're looking
+              for.
+            </p>
           </div>
         )}
 
+        {/* Results */}
         {!isLoading && !error && filtered.length > 0 && (
           <>
-            <p className="text-sm text-gray-400 mb-4">
-              {filtered.length} vehicle{filtered.length !== 1 ? "s" : ""} found
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="flex items-center justify-between mb-5">
+              <p className="text-sm text-muted-foreground">
+                <span className="font-semibold text-foreground">
+                  {filtered.length}
+                </span>{" "}
+                vehicle{filtered.length !== 1 ? "s" : ""} found
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
               {filtered.map((vehicle) => (
                 <VehicleCard key={vehicle.id} vehicle={vehicle} />
               ))}
