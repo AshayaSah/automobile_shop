@@ -12,6 +12,16 @@ const createVehicle = async (req, res) => {
     }
 };
 
+const getVehicleById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const vehicle = await vehicleService.getVehicleDetails(id);
+        res.json(vehicle);
+    } catch (err) {
+        res.status(404).json({ message: err.message });
+    }
+};
+
 const getVehicles = async (req, res) => {
     const { type, minPrice, maxPrice } = req.query;
 
@@ -23,5 +33,6 @@ const getVehicles = async (req, res) => {
 
 module.exports = {
     createVehicle,
+    getVehicleById,
     getVehicles,
 };

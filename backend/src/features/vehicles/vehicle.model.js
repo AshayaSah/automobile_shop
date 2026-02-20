@@ -23,6 +23,19 @@ const createVehicle = async (data) => {
     return result.rows[0];
 };
 
+const getVehicleById = async (id) => {
+    const result = await pool.query(
+        `SELECT v.*, u.name as owner_name
+     FROM vehicles v
+     JOIN users u ON v.user_id = u.id
+     WHERE v.id = $1`,
+        [id]
+    );
+
+    return result.rows[0];
+};
+
+
 const getVehicles = async (filters) => {
     let query = `SELECT v.*, u.name as owner_name 
                FROM vehicles v
@@ -58,5 +71,6 @@ const getVehicles = async (filters) => {
 
 module.exports = {
     createVehicle,
+    getVehicleById,
     getVehicles,
 };
