@@ -69,8 +69,39 @@ const getVehicles = async (filters) => {
     return result.rows;
 };
 
+const findVehiclesByUserId = async (userId) => {
+    const result = await pool.query(
+        "SELECT * FROM vehicles WHERE user_id = $1 ORDER BY created_at DESC",
+        [userId]
+    );
+    return result.rows;
+};
+
+const updateVehicle = async (id, data) => {
+    const { type, model, price, description, condition, contact, images } = data;
+
+    const result = await pool.query(
+        `UPDATE vehicles
+         SET type=$1, model=$2, price=$3, description=$4,
+             condition=$5, contact=$6, images=$7
+         WHERE id=$8
+         RETURNING *`,
+        [type, model, price, description, condition, contact, images, id]
+    );
+
+    return result.rows[0];
+};
+
+const deleteVehicle = async (id) => {
+    await pool.query("DELETE FROM vehicles WHERE id=$1", [id]);
+};
+
+
 module.exports = {
     createVehicle,
     getVehicleById,
     getVehicles,
+    findVehiclesByUserId,
+    updateVehicle,
+    deleteVehicle
 };
