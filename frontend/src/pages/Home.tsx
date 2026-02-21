@@ -58,7 +58,7 @@ const Home = () => {
     });
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="flex-1 overflow-hidden bg-background">
       {/* ── Hero Banner ───────────────────────────────── */}
       <div className="relative bg-card border-b border-border overflow-hidden">
         {/* Decorative background blobs */}

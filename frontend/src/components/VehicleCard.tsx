@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { ChevronLeft, ChevronRight, ImageOff, MapPin } from "lucide-react";
 import type { Vehicle } from "@/types/vehicle.types";
 
 const VehicleCard = ({ vehicle }: { vehicle: Vehicle }) => {
@@ -19,43 +23,70 @@ const VehicleCard = ({ vehicle }: { vehicle: Vehicle }) => {
   };
 
   return (
-    <Link to={`/vehicles/${vehicle.id}`} className="block group">
-      <div className="bg-card border border-border rounded-2xl overflow-hidden hover:shadow-md hover:border-primary/30 transition-all duration-300">
-        {/* Image */}
-        <div className="relative h-44 bg-muted overflow-hidden">
+    <Link to={`/vehicles/${vehicle.id}`} className="block group outline-none">
+      <Card className="overflow-hidden h-[380px] flex flex-col border-border/60 hover:border-primary/40 hover:shadow-lg transition-all duration-300 rounded-2xl bg-card">
+        {/* ── Image Section ── fixed height: 200px */}
+        <div className="relative h-[200px] shrink-0 bg-muted overflow-hidden">
           {images.length > 0 ? (
             <img
               src={images[activeIndex]}
               alt={vehicle.model}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <p className="text-xs text-muted-foreground">No image</p>
+            <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-muted-foreground">
+              <ImageOff className="w-8 h-8 opacity-40" />
+              <span className="text-xs">No image available</span>
             </div>
           )}
 
-          {/* Prev / Next arrows — show on hover only if multiple images */}
+          {/* Gradient overlay for bottom badges */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
+
+          {/* Prev / Next arrows */}
           {hasMultiple && (
             <>
-              <button
+              <Button
+                size="icon"
+                variant="ghost"
                 onClick={prev}
-                className="absolute left-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-background/80 backdrop-blur-sm border border-border/50 text-foreground text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-background"
+                className="absolute left-2 top-1/2 -translate-y-1/2 h-7 w-7 rounded-full bg-background/70 backdrop-blur-md border border-border/50 text-foreground opacity-0 group-hover:opacity-100 transition-opacity hover:bg-background shadow-sm"
               >
-                ‹
-              </button>
-              <button
+                <ChevronLeft className="h-3.5 w-3.5" />
+              </Button>
+              <Button
+                size="icon"
+                variant="ghost"
                 onClick={next}
-                className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-background/80 backdrop-blur-sm border border-border/50 text-foreground text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-background"
+                className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7 rounded-full bg-background/70 backdrop-blur-md border border-border/50 text-foreground opacity-0 group-hover:opacity-100 transition-opacity hover:bg-background shadow-sm"
               >
-                ›
-              </button>
+                <ChevronRight className="h-3.5 w-3.5" />
+              </Button>
             </>
           )}
 
+          {/* Image count — top left */}
+          {hasMultiple && (
+            <div className="absolute top-2.5 left-2.5">
+              <span className="bg-background/75 backdrop-blur-sm text-foreground text-[10px] font-semibold px-2 py-0.5 rounded-full border border-border/40 tabular-nums">
+                {activeIndex + 1} / {images.length}
+              </span>
+            </div>
+          )}
+
+          {/* Condition badge — top right */}
+          <div className="absolute top-2.5 right-2.5">
+            <Badge
+              variant={vehicle.condition === "new" ? "default" : "secondary"}
+              className="capitalize text-[10px] font-semibold tracking-wide shadow-sm"
+            >
+              {vehicle.condition}
+            </Badge>
+          </div>
+
           {/* Dot indicators */}
           {hasMultiple && (
-            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-1">
+            <div className="absolute bottom-9 left-1/2 -translate-x-1/2 flex gap-1 pointer-events-auto">
               {images.map((_, i) => (
                 <button
                   key={i}
@@ -63,63 +94,50 @@ const VehicleCard = ({ vehicle }: { vehicle: Vehicle }) => {
                     e.preventDefault();
                     setActiveIndex(i);
                   }}
-                  className={`w-1.5 h-1.5 rounded-full transition-all ${
-                    i === activeIndex ? "bg-white w-3" : "bg-white/50"
+                  className={`h-1 rounded-full transition-all duration-300 ${
+                    i === activeIndex
+                      ? "bg-white w-4"
+                      : "bg-white/50 w-1.5 hover:bg-white/75"
                   }`}
                 />
               ))}
             </div>
           )}
 
-          {/* Condition badge */}
-          <div className="absolute top-3 right-3">
-            <Badge
-              variant={vehicle.condition === "new" ? "default" : "secondary"}
-              className="capitalize text-[11px]"
-            >
-              {vehicle.condition}
-            </Badge>
-          </div>
-
-          {/* Type pill */}
+          {/* Type pill — bottom left */}
           <div className="absolute bottom-3 left-3">
-            <span className="bg-background/80 backdrop-blur-sm text-foreground text-[11px] font-medium px-2.5 py-1 rounded-full capitalize border border-border/50">
+            <span className="bg-background/75 backdrop-blur-sm text-foreground text-[11px] font-medium px-2.5 py-1 rounded-full capitalize border border-border/40">
               {vehicle.type}
             </span>
           </div>
-
-          {/* Image count badge top-left */}
-          {hasMultiple && (
-            <div className="absolute top-3 left-3">
-              <span className="bg-background/80 backdrop-blur-sm text-foreground text-[10px] font-medium px-2 py-0.5 rounded-full border border-border/50">
-                {activeIndex + 1}/{images.length}
-              </span>
-            </div>
-          )}
         </div>
 
-        {/* Info */}
-        <div className="p-4">
-          <h3 className="text-sm font-bold text-foreground leading-tight group-hover:text-primary transition-colors truncate mb-1">
+        {/* ── Content Section ── fills remaining height */}
+        <CardContent className="flex flex-col flex-1 p-4 gap-2 min-h-0">
+          {/* Title */}
+          <h3 className="text-sm font-bold text-foreground leading-snug group-hover:text-primary transition-colors truncate">
             {vehicle.model}
           </h3>
 
-          {vehicle.description && (
-            <p className="text-xs text-muted-foreground line-clamp-2 mb-3 leading-relaxed">
-              {vehicle.description}
-            </p>
-          )}
+          {/* Description — clamped to 2 lines */}
+          <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed flex-1 min-h-0">
+            {vehicle.description ?? "No description provided."}
+          </p>
 
-          <div className="flex items-center justify-between mt-auto pt-3 border-t border-border">
-            <span className="text-base font-extrabold text-primary">
-              Rs. {Number(vehicle.price).toLocaleString()}
+          <Separator className="my-1" />
+
+          {/* Footer: price + contact */}
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-base font-extrabold text-primary tracking-tight">
+              Rs.&nbsp;{Number(vehicle.price).toLocaleString()}
             </span>
-            <span className="text-xs text-muted-foreground truncate max-w-[100px]">
-              {vehicle.contact}
+            <span className="flex items-center gap-1 text-xs text-muted-foreground min-w-0">
+              <MapPin className="h-3 w-3 shrink-0 opacity-60" />
+              <span className="truncate max-w-[110px]">{vehicle.contact}</span>
             </span>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </Link>
   );
 };

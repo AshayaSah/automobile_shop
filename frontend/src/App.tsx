@@ -9,6 +9,8 @@ import { ThemeProvider } from "./components/theme-provider";
 import MyVehicles from "./pages/MyVehicles";
 import AddVehicle from "./pages/AddVehicle";
 import EditVehicle from "./pages/EditVehicle";
+import PublicRoute from "./components/PublicRoute";
+import PrivateRoute from "./components/PrivateRoute";
 
 function App() {
   return (
@@ -17,13 +19,53 @@ function App() {
         <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
           <Navbar></Navbar>
           <Routes>
+            {/* Public only — logged in users get redirected to / */}
+            <Route
+              path="/login"
+              element={
+                <PublicRoute>
+                  <Login />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/register"
+              element={
+                <PublicRoute>
+                  <Register />
+                </PublicRoute>
+              }
+            />
+
+            {/* Public for all */}
             <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/my-vehicles" element={<MyVehicles />} />
-            <Route path="/add-vehicle" element={<AddVehicle />} />
             <Route path="/vehicles/:id" element={<VehicleDetail />} />
-            <Route path="/vehicles/:id/edit" element={<EditVehicle />} />
+
+            {/* Private — guests get redirected to /login */}
+            <Route
+              path="/add-vehicle"
+              element={
+                <PrivateRoute>
+                  <AddVehicle />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/vehicles/:id/edit"
+              element={
+                <PrivateRoute>
+                  <EditVehicle />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/my-vehicles"
+              element={
+                <PrivateRoute>
+                  <MyVehicles />
+                </PrivateRoute>
+              }
+            />
           </Routes>
         </ThemeProvider>
       </AuthProvider>

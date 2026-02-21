@@ -51,7 +51,7 @@ export default function AddVehicle() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="flex-1 overflow-hidden  bg-background">
       <div className="max-w-2xl mx-auto px-6 py-10">
         <div className="mb-8">
           <button
